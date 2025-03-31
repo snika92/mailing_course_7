@@ -1,0 +1,69 @@
+{% extends 'mailing/base.html' %}
+{% load static %}
+{% load my_tags %}
+
+{% block title %}Рассылки{% endblock %}
+
+{% block header %}
+<div class="pricing-header p-3 pb-md-4 mx-auto text-center" style="margin-top:50px;">
+    <h1 class=" display-6 fw-normal">Все рассылки</h1>
+    <a class="btn btn-outline-primary mt-3" href="{% url 'mailing:mailing_add' %}">Добавить рассылку</a>
+</div>
+{% endblock %}
+
+
+{% block content %}
+<div class="row row-cols-1 row-cols-md-3 mb-0 text-center">
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th scope="col">№</th>
+            <th scope="col">Название</th>
+            <th scope="col">Начало</th>
+            <th scope="col">Окончание</th>
+            <th scope="col">Периодичность</th>
+            <th scope="col">Статус</th>
+            <th scope="col">Сообщение</th>
+            {% if request.user|has_group:"managers" %}
+            <th scope="col">Владелец</th>
+            {% endif %}
+            <th scope="col"></th>
+            <th scope="col"></th>
+            <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for mailing in mailings %}
+        {% if request.user|has_group:"managers" or user == mailing.owner %}
+        <tr>
+            <th scope="row">{{ mailing.pk }}</th>
+            <td>{{ mailing.title }}</td>
+            <td>{{ mailing.started_at }}</td>
+            <td>{{ mailing.finished_at }}</td>
+            <td>{{ mailing.period_mail }}</td>
+            <td>{{ mailing.status_mail }}</td>
+            <td>{{ mailing.message }}</td>
+            {% if request.user|has_group:"managers" %}
+            <td>{{ mailing.owner }}</td>
+            {% else %}
+            <td></td>
+            {% endif %}
+            <td><a href="{% url 'mailing:mailing_details' mailing.pk %}" class="link-primary">Подробнее</a></td>
+            {% if user == mailing.owner %}
+            <td><a href="{% url 'mailing:mailing_update' mailing.pk %}" class="link-success">Редактировать</a></td>
+            {% else %}
+            <td></td>
+            {% endif %}
+            {% if perms.mailing.delete_mailing or user == mailing.owner %}
+            <td><a href="{% url 'mailing:mailing_delete' mailing.pk %}" class="link-danger">Удалить</a></td>
+            {% else %}
+            <td></td>
+            {% endif %}
+        </tr>
+        {% endif %}
+        {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+{% endblock %}
