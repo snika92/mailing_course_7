@@ -4,7 +4,7 @@ from users.models import User
 
 
 class Client(models.Model):
-    email = models.EmailField(max_length=50, unique=True, verbose_name="Почта")
+    email = models.EmailField(max_length=50, verbose_name="Почта")
     initials = models.CharField(max_length=100, verbose_name="Ф.И.О.")
     comment = models.TextField(null=True, blank=True, verbose_name="Комментарий")
     owner = models.ForeignKey(
@@ -93,7 +93,7 @@ class Mailing(models.Model):
         verbose_name="Статус_рассылки",
     )
     clients = models.ManyToManyField(
-        Client, verbose_name="клиенты_рассылки", related_name="mailing_clients"
+        Client, verbose_name="Клиенты_рассылки", related_name="mailing_clients"
     )
     message = models.ForeignKey(
         Message,
@@ -116,6 +116,9 @@ class Mailing(models.Model):
     class Meta:
         verbose_name = "Рассылка"
         verbose_name_plural = "Рассылки"
+        permissions = [
+            ("can_disable_mailing", "Can disable mailing"),
+        ]
 
 
 class AttemptToSend(models.Model):
@@ -145,3 +148,4 @@ class AttemptToSend(models.Model):
     class Meta:
         verbose_name = "Попытка рассылки"
         verbose_name_plural = "Попытки рассылок"
+        ordering = ["status_log"]
