@@ -1,7 +1,7 @@
-from django.utils import timezone
-from django.core.cache import cache
-from config.settings import CACHE_ENABLED, EMAIL_HOST_USER
 from django.core.mail import send_mail
+from django.utils import timezone
+
+from config.settings import EMAIL_HOST_USER
 from mailing.models import AttemptToSend
 
 
@@ -19,7 +19,9 @@ def send_email(mailing, client):
         mail_response = e
 
     AttemptToSend.objects.create(
-        status_log=AttemptToSend.SUCCESS if mail_response == 1 else AttemptToSend.FAILED,
+        status_log=(
+            AttemptToSend.SUCCESS if mail_response == 1 else AttemptToSend.FAILED
+        ),
         server_response=mail_response if mail_response != 1 else "",
         mailing_list=mailing,
         client=client,

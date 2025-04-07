@@ -1,19 +1,21 @@
 import secrets
 
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.contrib.auth.views import LoginView, PasswordResetView, PasswordResetConfirmView
-from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.auth.mixins import (LoginRequiredMixin,
+                                        PermissionRequiredMixin)
+from django.contrib.auth.views import (LoginView, PasswordResetConfirmView,
+                                       PasswordResetView)
 from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
-from django.views.generic.edit import CreateView, UpdateView
-from django.views.generic import ListView, DetailView
 from django.views import View
+from django.views.generic import DetailView, ListView
+from django.views.generic.edit import CreateView, UpdateView
 
 from config.settings import EMAIL_HOST_USER
 
-from .forms import UserLoginForm, UserRegisterForm, UserUpdateForm, UserForgotPasswordForm, UserSetNewPasswordForm
+from .forms import (UserForgotPasswordForm, UserLoginForm, UserRegisterForm,
+                    UserSetNewPasswordForm, UserUpdateForm)
 from .models import User
 
 
@@ -43,7 +45,7 @@ def send_welcome_email(user_email):
     send_mail(
         "Добро пожаловать в менеджер рассылок!",
         f"Спасибо, что зарегистрировались!",
-        EMAIL_HOST_USER,
+        f"{EMAIL_HOST_USER}",
         [user_email],
     )
 
@@ -71,7 +73,7 @@ class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     def get_queryset(self, *args, **kwargs):
         queryset = super().get_queryset()
         queryset = queryset.filter(is_superuser=False)
-        queryset = queryset.exclude(groups__permissions__codename='can_block_users')
+        queryset = queryset.exclude(groups__permissions__codename="can_block_users")
         return queryset.order_by("-is_active")
 
 
@@ -81,7 +83,9 @@ class BlockUserView(LoginRequiredMixin, View):
         user = get_object_or_404(User, id=pk)
 
         if not request.user.has_perm("users.can_block_users"):
-            raise PermissionDenied("У вас нет права на блокировку/разблокировку пользователя")
+            raise PermissionDenied(
+                "У вас нет права на блокировку/разблокировку пользователя"
+            )
 
         if user.is_active:
             user.is_active = False
@@ -114,17 +118,19 @@ class UserForgotPasswordView(PasswordResetView):
     """
     Представление по сбросу пароля по почте
     """
+
     from_email = EMAIL_HOST_USER
     form_class = UserForgotPasswordForm
-    template_name = 'users/password_reset.html'
+    template_name = "users/password_reset.html"
     success_url = reverse_lazy("users:password_reset_done")
-    email_template_name = 'users/password_reset_email.html'
+    email_template_name = "users/password_reset_email.html"
 
 
 class UserPasswordResetConfirmView(PasswordResetConfirmView):
     """
     Представление установки нового пароля
     """
+
     form_class = UserSetNewPasswordForm
-    template_name = 'users/password_reset_confirm.html'
+    template_name = "users/password_reset_confirm.html"
     success_url = reverse_lazy("users:password_reset_complete")

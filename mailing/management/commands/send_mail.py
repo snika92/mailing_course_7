@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand
+
 from mailing.models import Mailing
 from mailing.services import send_email, update_status
 
@@ -20,6 +21,8 @@ class Command(BaseCommand):
                     send_email(mailing, client)
                     self.stdout.write(f"Письмо отправлено на {client.email} {client}")
             else:
-                self.stdout.write(f"Рассылка {mailing.title} завершена и не может быть отправлена.")
+                self.stdout.write(
+                    f"Рассылка {mailing.title} завершена и не может быть отправлена."
+                )
 
         self.stdout.write(self.style.SUCCESS("Все рассылки обработаны!"))

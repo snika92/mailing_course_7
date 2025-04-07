@@ -1,8 +1,8 @@
 from django import forms
 from django.contrib.auth import password_validation
-from django.contrib.auth.forms import (AuthenticationForm, UserCreationForm,
-                                       UsernameField, UserChangeForm, PasswordResetForm, SetPasswordForm)
-from django.forms import BooleanField
+from django.contrib.auth.forms import (AuthenticationForm, PasswordResetForm,
+                                       SetPasswordForm, UserChangeForm,
+                                       UserCreationForm)
 from phonenumber_field.formfields import PhoneNumberField
 
 from mailing.forms import StyleFormMixin
@@ -54,10 +54,12 @@ class UserForgotPasswordForm(PasswordResetForm):
         label="Email",
         max_length=254,
         widget=forms.EmailInput(
-            attrs={'class': 'form-control',
-                   'placeholder': 'Введите Email',
-                   "autocomplete": "email"}
-        )
+            attrs={
+                "class": "form-control",
+                "placeholder": "Введите Email",
+                "autocomplete": "email",
+            }
+        ),
     )
 
 
@@ -66,25 +68,27 @@ class UserSetNewPasswordForm(SetPasswordForm):
     Изменение пароля пользователя после подтверждения
     """
 
-    error_messages = {
-        "password_mismatch": "Пароли не совпадают"
-    }
+    error_messages = {"password_mismatch": "Пароли не совпадают"}
     new_password1 = forms.CharField(
-        label='Новый пароль',
+        label="Новый пароль",
         widget=forms.PasswordInput(
-            attrs={'class': 'form-control',
-                   'placeholder': 'Введите новый пароль',
-                   "autocomplete": "new-password"}
+            attrs={
+                "class": "form-control",
+                "placeholder": "Введите новый пароль",
+                "autocomplete": "new-password",
+            }
         ),
         strip=False,
         help_text=password_validation.password_validators_help_text_html(),
     )
     new_password2 = forms.CharField(
-        label='Подтверждение нового пароля',
+        label="Подтверждение нового пароля",
         strip=False,
         widget=forms.PasswordInput(
-            attrs={'class': 'form-control',
-                   'placeholder': 'Подтвердите новый пароль',
-                   "autocomplete": "new-password"}
+            attrs={
+                "class": "form-control",
+                "placeholder": "Подтвердите новый пароль",
+                "autocomplete": "new-password",
+            }
         ),
     )
