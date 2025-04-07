@@ -1,0 +1,28 @@
+{% extends 'mailing/base.html' %}
+{% load static %}
+{% load my_tags %}
+
+{% block title %}Подробности о пользователе{% endblock %}
+
+{% block content %}
+<div class="row row-cols-1 row-cols-md-3 mb-0 text-center" style="margin-top:100px;">
+    <div class="col">
+        <div class="card shadow-sm mx-auto d-block" style="width:900px">
+            <div class="card-body border-top">
+                <h5 class="card-title">{{ user.email }}</h5>
+                <img class="card-img-top" src="{{ user.avatar | media_filter }}" alt="Card image cap">
+                <p class="card-text border-top">Телефон: {{ user.phone }}</p>
+                <p class="card-text border-top">Страна: {{ user.country }}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="btn-group">
+                        <a href="{% url 'users:user_update' user.pk %}" type="button"
+                           class="btn btn-sm btn-outline-secondary">Редактировать</a>
+                        <a href="{% url 'mailing:home' %}" type="button"
+                           class="btn btn-sm btn-outline-secondary">Назад</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

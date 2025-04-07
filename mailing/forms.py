@@ -1,7 +1,5 @@
-from django.conf import settings
-from django.core.exceptions import ValidationError
-from django.forms import (BooleanField, CheckboxSelectMultiple, ModelForm,
-                          ModelMultipleChoiceField, SelectMultiple)
+from django.forms import (BooleanField, ModelForm, ModelMultipleChoiceField,
+                          SelectMultiple)
 
 from mailing.models import Client, Mailing, Message
 
@@ -42,4 +40,4 @@ class MailingForm(StyleFormMixin, ModelForm):
 
     class Meta:
         model = Mailing
-        exclude = ["started_at", "finished_at", "owner", "status_mail"]
+        exclude = ["started_at", "owner", "status_mail"]

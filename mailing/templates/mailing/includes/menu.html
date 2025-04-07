@@ -3,7 +3,7 @@
 <nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
         <a class="navbar-brand" href="{% url 'mailing:home' %}">
-              <img src="{% static 'images/logo_1.png' %}" class="img-responsive" width="40"
+            <img src="{% static 'images/logo_1.png' %}" class="img-responsive" width="40"
                  style="border-radius: 30px;" alt="Logo">
             <span class="fs-4" style="margin-left:20px;">Менеджер рассылок</span>
         </a>
@@ -12,7 +12,7 @@
                 aria-label="Переключатель навигации">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" style="margin-left:600px;" id="navbarNavDropdown">
+        <div class="collapse navbar-collapse" style="margin-left:300px;" id="navbarNavDropdown">
             <ul class="navbar-nav">
                 {% if user.is_authenticated %}
                 <li class="nav-item">
@@ -29,6 +29,14 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'mailing:logs' %}">Логи</a>
+                </li>
+                {% if perms.users.view_user %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'users:users_list' %}">Пользователи</a>
+                </li>
+                {% endif %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'users:user_details' user.pk %}">Профиль</a>
                 </li>
                 <li class="nav-item">
                     <form method="post" action="{% url 'users:logout' %}" style="display: inline">
