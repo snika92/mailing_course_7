@@ -42,4 +42,4 @@ class MailingForm(StyleFormMixin, ModelForm):
 
     class Meta:
         model = Mailing
-        exclude = ["started_at", "finished_at", "owner", "status_mail"]
+        exclude = ["started_at", "owner", "status_mail"]
