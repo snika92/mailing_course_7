@@ -2,16 +2,18 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, request
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
+from django.views import View
+from django.contrib import messages
 from django.views.decorators.cache import cache_page
 from django.views.generic import DetailView, ListView, TemplateView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
-# from .services import GameService
 from .forms import ClientForm, MailingForm, MessageForm
 from .models import AttemptToSend, Client, Mailing, Message
+from mailing.services import send_email, update_status
 
 
 class HomeView(TemplateView):
@@ -51,6 +53,7 @@ class MessageListView(LoginRequiredMixin, ListView):
         return queryset
 
 
+@method_decorator(cache_page(60*15), name="dispatch")
 class MessageDetailView(LoginRequiredMixin, DetailView):
     model = Message
     template_name = "mailing/message_details.html"
@@ -103,6 +106,7 @@ class ClientListView(LoginRequiredMixin, ListView):
         return queryset
 
 
+@method_decorator(cache_page(60*15), name="dispatch")
 class ClientDetailView(LoginRequiredMixin, DetailView):
     model = Client
     template_name = "mailing/client_details.html"
@@ -114,6 +118,7 @@ class ClientCreateView(LoginRequiredMixin, CreateView):
     form_class = ClientForm
     template_name = "mailing/client_add.html"
     success_url = reverse_lazy("mailing:clients_all")
+    permission_required = "mailing.add_client"
 
     def form_valid(self, form):
         client = form.save()
@@ -128,6 +133,7 @@ class ClientUpdateView(LoginRequiredMixin, UpdateView):
     form_class = ClientForm
     template_name = "mailing/client_add.html"
     success_url = reverse_lazy("mailing:clients_all")
+    permission_required = "mailing.change_client"
 
 
 class ClientDeleteView(LoginRequiredMixin, DeleteView):
@@ -155,6 +161,7 @@ class MailingListView(LoginRequiredMixin, ListView):
         return queryset
 
 
+@method_decorator(cache_page(60*15), name="dispatch")
 class MailingDetailView(LoginRequiredMixin, DetailView):
     model = Mailing
     template_name = "mailing/mailing_details.html"
@@ -207,11 +214,60 @@ class MailingDeleteView(LoginRequiredMixin, DeleteView):
         mailing.delete()
 
 
+class MailingSendMail(LoginRequiredMixin, View):
+    """Класс для отправки писем пользователям"""
+
+    model = Mailing
+    template_name = "mailing/newsletter/mailing_details.html"
+    context_object_name = "mailings"
+
+    def post(self, request, pk):
+        mailing = get_object_or_404(Mailing, id=pk)
+        if mailing.status_mail == "COMPLETED":
+            messages.error(request, "Рассылка не может быть инициирована, т.к. была завершена")
+        else:
+            self.send_email(mailing, request)
+            messages.success(request, "Письма отправлены!")
+
+        return redirect("mailing:mailing_details", pk=pk)
+
+    @staticmethod
+    def send_email(mailing, request):
+        clients = mailing.clients.all()
+        update_status(mailing)
+        if mailing.status_mail != "COMPLETED":
+            for client in clients:
+                send_email(mailing, client)
+        else:
+            messages.error(
+                request, f"Рассылка не может быть инициирована, т.к. дата окончания рассылки {mailing.finished_at}"
+            )
+
+
 class LogsView(LoginRequiredMixin, ListView):
     model = AttemptToSend
     template_name = "mailing/logs.html"
     context_object_name = "logs"
 
     def get_queryset(self, *args, **kwargs):
-        queryset = AttemptToSend.objects.order_by("-pk")
-        return queryset
+        queryset = super().get_queryset()
+        queryset = queryset.filter(mailing_list__owner=self.request.user)
+        return queryset.order_by("-pk")
+
+
+class DisableMailingView(LoginRequiredMixin, View):
+
+    def post(self, request, pk):
+        mailing = get_object_or_404(Mailing, id=pk)
+
+        if not request.user.has_perm("mailing.can_disable_mailing") and not request.user == mailing.owner:
+            raise PermissionDenied("У вас нет права на отключение/включение рассылки")
+
+        if mailing.status_mail == "COMPLETED":
+            mailing.status_mail = "STARTED"
+        else:
+            mailing.status_mail = "COMPLETED"
+
+        mailing.save()
+
+        return redirect("mailing:mailing_details", pk=pk)
