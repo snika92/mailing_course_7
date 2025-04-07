@@ -31,10 +31,10 @@
         <tr>
             <th scope="row">{{ log.pk }}</th>
             <td>{{ log.client }}</td>
-            <td><a href="{% url 'mailing:mailing_details' log.client.mailing_list.pk %}" class="link-primary">{{ log.mailing_list }}</a></td>
+            <td><a href="{% url 'mailing:mailing_details' log.mailing_list.pk %}" class="link-primary">{{ log.mailing_list }}</a></td>
             <td>{{ log.status_log }}</td>
-            <td>{{ client.time_log_send }}</td>
-            <td>{{ client.server_response }}</td>
+            <td>{{ log.time_log_send }}</td>
+            <td>{{ log.server_response }}</td>
             {% endif %}
         {% endfor %}
         </tbody>

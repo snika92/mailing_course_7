@@ -2,7 +2,7 @@
 {% load static %}
 {% load my_tags %}
 
-{% block title %}Подробности о рассылке{% endblock %}
+{% block title %}Подробности рассылки{% endblock %}
 
 {% block content %}
 <div class="row row-cols-1 row-cols-md-3 mb-0 text-center" style="margin-top:100px; margin-left:150px;">
@@ -18,7 +18,8 @@
                 {% endif %}
                 <p class="card-text border-top">Начало: {{ mailing.started_at }}</p>
                 <p class="card-text border-top">Окончание: {{ mailing.finished_at }}</p>
-                <a href="{% url 'mailing:message_details' mailing.message.pk %}" class="link-primary">Сообщение: {{ mailing.message.theme }}</a></td>
+                <p class="card-text border-top">Сообщение:
+                <a href="{% url 'mailing:message_details' mailing.message.pk %}" class="link-primary">{{ mailing.message }}</a></p>
                 <p class="card-text border-top">{{mailing.message.body }}</p>
                 <p class="card-text border-top">Клиенты: </p>
                 <table class="table table-hover">
@@ -57,6 +58,13 @@
                         {% endif %}
                         <a href="{% url 'mailing:mailings_all' %}" type="button"
                            class="btn btn-sm btn-outline-secondary">Назад</a>
+
+                        {% if user == mailing.owner %}
+                        <form action="{% url 'mailing:mailing_sendmail' mailing.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-success" style="margin-left:480px;">Отправить рассылку</button>
+                        </form>
+                        {% endif %}
                     </div>
                 </div>
             </div>

@@ -30,6 +30,7 @@
             <th scope="col"></th>
             <th scope="col"></th>
             <th scope="col"></th>
+            <th scope="col"></th>
         </tr>
         </thead>
         <tbody>
@@ -51,6 +52,18 @@
             <td><a href="{% url 'mailing:mailing_details' mailing.pk %}" class="link-primary">Подробнее</a></td>
             {% if user == mailing.owner %}
             <td><a href="{% url 'mailing:mailing_update' mailing.pk %}" class="link-success">Редактировать</a></td>
+            {% else %}
+            <td></td>
+            {% endif %}
+            {% if perms.mailing.can_disable_mailing or user == mailing.owner %}
+            <td><form action="{% url 'mailing:disable_mailing' mailing.pk %}" method="post">
+                {% csrf_token %}
+                {% if mailing.status_mail != 'COMPLETED' %}
+                <button class="btn btn-link link-danger">Отключить рассылку</button>
+                {% else %}
+                <button class="btn btn-link link-success">Включить рассылку</button>
+                {% endif %}
+            </form></td>
             {% else %}
             <td></td>
             {% endif %}
