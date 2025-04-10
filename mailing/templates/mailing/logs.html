@@ -27,7 +27,7 @@
         </thead>
         <tbody>
         {% for log in logs %}
-        {% if request.user|has_group:"managers" or user == log.mailing_list.owner %}
+        {% if request.user|has_group:"managers" or user == log.mailing_list.owner or request.user.is_superuser %}
         <tr>
             <th scope="row">{{ log.pk }}</th>
             <td>{{ log.client }}</td>

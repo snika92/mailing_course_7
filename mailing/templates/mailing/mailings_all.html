@@ -24,7 +24,7 @@
             <th scope="col">Периодичность</th>
             <th scope="col">Статус</th>
             <th scope="col">Сообщение</th>
-            {% if request.user|has_group:"managers" %}
+            {% if request.user|has_group:"managers" or request.user.is_superuser %}
             <th scope="col">Владелец</th>
             {% endif %}
             <th scope="col"></th>
@@ -35,7 +35,7 @@
         </thead>
         <tbody>
         {% for mailing in mailings %}
-        {% if request.user|has_group:"managers" or user == mailing.owner %}
+        {% if request.user|has_group:"managers" or user == mailing.owner or request.user.is_superuser %}
         <tr>
             <th scope="row">{{ mailing.pk }}</th>
             <td>{{ mailing.title }}</td>
@@ -44,7 +44,7 @@
             <td>{{ mailing.period_mail }}</td>
             <td>{{ mailing.status_mail }}</td>
             <td>{{ mailing.message }}</td>
-            {% if request.user|has_group:"managers" %}
+            {% if request.user|has_group:"managers" or request.user.is_superuser %}
             <td>{{ mailing.owner }}</td>
             {% else %}
             <td></td>

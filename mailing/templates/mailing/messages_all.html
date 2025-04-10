@@ -20,7 +20,7 @@
             <th scope="col">№</th>
             <th scope="col">Тема</th>
             <th scope="col">Текст</th>
-            {% if request.user|has_group:"managers" %}
+            {% if request.user|has_group:"managers" or request.user.is_superuser %}
             <th scope="col">Владелец</th>
             {% endif %}
             <th scope="col"></th>
@@ -30,12 +30,12 @@
         </thead>
         <tbody>
         {% for message in messages %}
-        {% if request.user|has_group:"managers" or user == message.owner %}
+        {% if request.user|has_group:"managers" or user == message.owner or request.user.is_superuser %}
         <tr>
             <th scope="row">{{ message.pk }}</th>
             <td>{{ message.theme }}</td>
             <td>{{ message.body | truncatechars:50 }}</td>
-            {% if request.user|has_group:"managers" %}
+            {% if request.user|has_group:"managers" or request.user.is_superuser %}
             <td>{{ message.owner }}</td>
             {% else %}
             <td></td>

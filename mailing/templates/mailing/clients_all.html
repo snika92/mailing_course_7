@@ -22,7 +22,7 @@
             <th scope="col">Ф.И.О.</th>
             <th scope="col">Email</th>
             <th scope="col">Комментарий</th>
-                {% if request.user|has_group:"managers" %}
+                {% if request.user|has_group:"managers" or request.user.is_superuser %}
             <th scope="col">Владелец</th>
             {% endif %}
             <th scope="col"></th>
@@ -32,13 +32,13 @@
         </thead>
         <tbody>
         {% for client in clients %}
-        {% if request.user|has_group:"managers" or user == client.owner %}
+        {% if request.user|has_group:"managers" or user == client.owner or request.user.is_superuser %}
         <tr>
             <th scope="row">{{ client.pk }}</th>
             <td>{{ client.initials }}</td>
             <td>{{ client.email }}</td>
             <td>{{ client.comment }}</td>
-            {% if request.user|has_group:"managers" %}
+            {% if request.user|has_group:"managers" or request.user.is_superuser %}
             <td>{{ client.owner }}</td>
             {% else %}
             <td></td>
