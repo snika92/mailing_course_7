@@ -36,3 +36,8 @@ def update_status(mailing):
     elif mailing.status_mail != "COMPLETED":
         mailing.status_mail = "STARTED"
     mailing.save()
+
+
+def get_list_by_owner(owner_id, model):
+    list_by_owner = model.objects.filter(owner=owner_id)
+    return list_by_owner
