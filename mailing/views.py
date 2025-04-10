@@ -9,7 +9,7 @@ from django.views.decorators.cache import cache_page
 from django.views.generic import DetailView, ListView, TemplateView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
-from mailing.services import send_email, update_status
+from mailing.services import send_email, update_status, get_list_by_owner
 
 from .forms import ClientForm, MailingForm, MessageForm
 from .models import AttemptToSend, Client, Mailing, Message
@@ -21,7 +21,7 @@ class HomeView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
-        if user.groups.filter(name="managers"):
+        if user.groups.filter(name="managers") or user.is_superuser:
             messages_count = Message.objects.all().count()
             mailings_count = Mailing.objects.all().count()
             active_mailings_count = Mailing.objects.filter(
@@ -48,8 +48,9 @@ class MessageListView(LoginRequiredMixin, ListView):
     context_object_name = "messages"
 
     def get_queryset(self, *args, **kwargs):
-        queryset = Message.objects.order_by("-pk")
-        return queryset
+        if self.request.user.groups.filter(name='managers') or self.request.user.is_superuser:
+            return Message.objects.order_by("-pk")
+        return get_list_by_owner(self.request.user.id, Message).order_by("-pk")
 
 
 @method_decorator(cache_page(60 * 15), name="dispatch")
@@ -101,8 +102,9 @@ class ClientListView(LoginRequiredMixin, ListView):
     context_object_name = "clients"
 
     def get_queryset(self, *args, **kwargs):
-        queryset = Client.objects.order_by("-pk")
-        return queryset
+        if self.request.user.groups.filter(name='managers') or self.request.user.is_superuser:
+            return Client.objects.order_by("-pk")
+        return get_list_by_owner(self.request.user.id, Client).order_by("-pk")
 
 
 @method_decorator(cache_page(60 * 15), name="dispatch")
@@ -156,8 +158,9 @@ class MailingListView(LoginRequiredMixin, ListView):
     context_object_name = "mailings"
 
     def get_queryset(self, *args, **kwargs):
-        queryset = Mailing.objects.order_by("-pk")
-        return queryset
+        if self.request.user.groups.filter(name='managers') or self.request.user.is_superuser:
+            return Mailing.objects.order_by("-pk")
+        return get_list_by_owner(self.request.user.id, Mailing).order_by("-pk")
 
 
 @method_decorator(cache_page(60 * 15), name="dispatch")
@@ -253,6 +256,8 @@ class LogsView(LoginRequiredMixin, ListView):
 
     def get_queryset(self, *args, **kwargs):
         queryset = super().get_queryset()
+        if self.request.user.groups.filter(name='managers') or self.request.user.is_superuser:
+            return queryset.order_by("-pk")
         queryset = queryset.filter(mailing_list__owner=self.request.user)
         return queryset.order_by("-pk")
 
