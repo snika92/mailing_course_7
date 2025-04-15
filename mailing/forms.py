@@ -37,6 +37,9 @@ class MailingForm(StyleFormMixin, ModelForm):
             self.fields["clients"] = ModelMultipleChoiceField(
                 queryset=qs_clients, widget=SelectMultiple, label="Клиенты"
             )
+        for field_name, field in self.fields.items():
+            if field_name == "clients":
+                field.widget.attrs["class"] = "form-select"
 
     class Meta:
         model = Mailing
