@@ -59,6 +59,9 @@ class MessageDetailView(LoginRequiredMixin, DetailView):
     template_name = "mailing/message_details.html"
     context_object_name = "message"
 
+    def get_queryset(self):
+        return get_list_by_owner(self.request.user.id, Message).order_by("-pk")
+
 
 class MessageCreateView(LoginRequiredMixin, CreateView):
     model = Message
@@ -112,6 +115,9 @@ class ClientDetailView(LoginRequiredMixin, DetailView):
     model = Client
     template_name = "mailing/client_details.html"
     context_object_name = "client"
+
+    def get_queryset(self):
+        return get_list_by_owner(self.request.user.id, Client).order_by("-pk")
 
 
 class ClientCreateView(LoginRequiredMixin, CreateView):
@@ -168,6 +174,9 @@ class MailingDetailView(LoginRequiredMixin, DetailView):
     model = Mailing
     template_name = "mailing/mailing_details.html"
     context_object_name = "mailing"
+
+    def get_queryset(self):
+        return get_list_by_owner(self.request.user.id, Mailing).order_by("-pk")
 
 
 class MailingCreateView(LoginRequiredMixin, CreateView):
