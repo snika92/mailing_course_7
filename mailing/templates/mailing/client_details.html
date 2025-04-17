@@ -1,0 +1,65 @@
+{% extends 'mailing/base.html' %}
+{% load static %}
+{% load my_tags %}
+
+{% block title %}Подробности о клиенте{% endblock %}
+
+{% block content %}
+<div class="row row-cols-1 row-cols-md-3 mb-0 text-center" style="margin-top:100px;">
+
+    {% if request.user|has_group:"managers" %}
+    <div class="col">
+        <div class="card shadow-sm mx-auto d-block" style="width:900px">
+            <div class="card-body border-top">
+                <h5 class="card-title">{{ client.initials }}</h5>
+                <p class="card-text border-top">{{ client.email }}</p>
+                <p class="card-text border-top">{{ client.comment }}</p>
+                <p class="card-text border-top">Владелец: {{ client.owner }}</p>
+                <p class="card-text border-top">Создан: {{ client.created_at }}</p>
+                <p class="card-text border-top">Обновлен: {{ client.updated_at }}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="btn-group">
+                        {% if user == client.owner %}
+                        <a href="{% url 'mailing:client_update' client.pk %}" type="button"
+                           class="btn btn-sm btn-outline-secondary">Редактировать</a>
+                        {% endif %}
+                        {% if perms.mailing.delete_client or user == client.owner %}
+                        <a href="{% url 'mailing:client_delete' client.pk %}" type="button"
+                           class="btn btn-sm btn-outline-danger">Удалить</a>
+                        {% endif %}
+                        <a href="{% url 'mailing:clients_all' %}" type="button"
+                           class="btn btn-sm btn-outline-secondary">Назад</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% elif user == client.owner %}
+    <div class="col">
+        <div class="card shadow-sm mx-auto d-block" style="width:900px">
+            <div class="card-body border-top">
+                <h5 class="card-title">{{ client.initials }}</h5>
+                <p class="card-text border-top">{{ client.email }}</p>
+                <p class="card-text border-top">{{ client.comment }}</p>
+                <p class="card-text border-top">Создан: {{ client.created_at }}</p>
+                <p class="card-text border-top">Обновлен: {{ client.updated_at }}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="btn-group">
+                        <a href="{% url 'mailing:client_update' client.pk %}" type="button"
+                           class="btn btn-sm btn-outline-secondary">Редактировать</a>
+                        {% if perms.mailing.delete_client or user == client.owner %}
+                        <a href="{% url 'mailing:client_delete' client.pk %}" type="button"
+                           class="btn btn-sm btn-outline-danger">Удалить</a>
+                        {% endif %}
+                        <a href="{% url 'mailing:clients_all' %}" type="button"
+                           class="btn btn-sm btn-outline-secondary">Назад</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

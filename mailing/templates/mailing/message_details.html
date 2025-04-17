@@ -1,0 +1,63 @@
+{% extends 'mailing/base.html' %}
+{% load static %}
+{% load my_tags %}
+
+{% block title %}Подробности о сообщении{% endblock %}
+
+{% block content %}
+<div class="row row-cols-1 row-cols-md-3 mb-0 text-center" style="margin-top:100px;">
+
+    {% if request.user|has_group:"managers" %}
+    <div class="col">
+        <div class="card shadow-sm mx-auto d-block" style="width:900px">
+            <div class="card-body border-top">
+                <h5 class="card-title">{{ message.theme }}</h5>
+                <p class="card-text border-top">{{ message.body }}</p>
+                <p class="card-text border-top">Владелец: {{ message.owner }}</p>
+                <p class="card-text border-top">Создано: {{ message.created_at }}</p>
+                <p class="card-text border-top">Обновлено: {{ message.updated_at }}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="btn-group">
+                        {% if user == message.owner %}
+                        <a href="{% url 'mailing:message_update' message.pk %}" type="button"
+                           class="btn btn-sm btn-outline-secondary">Редактировать</a>
+                        {% endif %}
+                        {% if perms.mailing.delete_message or user == message.owner %}
+                        <a href="{% url 'mailing:message_delete' message.pk %}" type="button"
+                           class="btn btn-sm btn-outline-danger">Удалить</a>
+                        {% endif %}
+                        <a href="{% url 'mailing:messages_all' %}" type="button"
+                           class="btn btn-sm btn-outline-secondary">Назад</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% elif user == message.owner %}
+    <div class="col">
+        <div class="card shadow-sm mx-auto d-block" style="width:900px">
+            <div class="card-body border-top">
+                <h5 class="card-title">{{ message.theme }}</h5>
+                <p class="card-text border-top">{{ message.body }}</p>
+                <p class="card-text border-top">Создано: {{ message.created_at }}</p>
+                <p class="card-text border-top">Обновлено: {{ message.updated_at }}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="btn-group">
+                        <a href="{% url 'mailing:message_update' message.pk %}" type="button"
+                           class="btn btn-sm btn-outline-secondary">Редактировать</a>
+                        {% if perms.mailing.delete_message or user == message.owner %}
+                        <a href="{% url 'mailing:message_delete' message.pk %}" type="button"
+                           class="btn btn-sm btn-outline-danger">Удалить</a>
+                        {% endif %}
+                        <a href="{% url 'mailing:messages_all' %}" type="button"
+                           class="btn btn-sm btn-outline-secondary">Назад</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

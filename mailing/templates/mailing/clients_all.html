@@ -1,0 +1,64 @@
+{% extends 'mailing/base.html' %}
+{% load static %}
+{% load my_tags %}
+
+{% block title %}Клиенты{% endblock %}
+
+{% block header %}
+<div class="pricing-header p-3 pb-md-4 mx-auto text-center" style="margin-top:50px;">
+    <h1 class=" display-6 fw-normal">Все получатели</h1>
+    <a class="btn btn-outline-primary mt-3" href="{% url 'mailing:client_add' %}">Добавить получателя</a>
+</div>
+{% endblock %}
+
+
+{% block content %}
+<div class="row row-cols-1 row-cols-md-3 mb-0 text-center">
+
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th scope="col">№</th>
+            <th scope="col">Ф.И.О.</th>
+            <th scope="col">Email</th>
+            <th scope="col">Комментарий</th>
+                {% if request.user|has_group:"managers" or request.user.is_superuser %}
+            <th scope="col">Владелец</th>
+            {% endif %}
+            <th scope="col"></th>
+            <th scope="col"></th>
+            <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for client in clients %}
+        {% if request.user|has_group:"managers" or user == client.owner or request.user.is_superuser %}
+        <tr>
+            <th scope="row">{{ client.pk }}</th>
+            <td>{{ client.initials }}</td>
+            <td>{{ client.email }}</td>
+            <td>{{ client.comment }}</td>
+            {% if request.user|has_group:"managers" or request.user.is_superuser %}
+            <td>{{ client.owner }}</td>
+            {% else %}
+            <td></td>
+            {% endif %}
+            <td><a href="{% url 'mailing:client_details' client.pk %}" class="link-primary">Подробнее</a></td>
+            {% if user == client.owner %}
+            <td><a href="{% url 'mailing:client_update' client.pk %}" class="link-success">Редактировать</a></td>
+            {% else %}
+            <td></td>
+            {% endif %}
+            {% if perms.mailing.delete_client or user == client.owner %}
+            <td><a href="{% url 'mailing:client_delete' client.pk %}" class="link-danger">Удалить</a></td>
+            {% else %}
+            <td></td>
+            {% endif %}
+        </tr>
+            {% endif %}
+        {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+{% endblock %}

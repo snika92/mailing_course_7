@@ -1,0 +1,51 @@
+{% extends 'mailing/base.html' %}
+{% load static %}
+{% load my_tags %}
+
+{% block title %}Список пользователей{% endblock %}
+
+{% block header %}
+<div class="pricing-header p-3 pb-md-4 mx-auto text-center" style="margin-top:50px;">
+    <h1 class=" display-6 fw-normal">Все пользователи</h1>
+</div>
+{% endblock %}
+
+
+{% block content %}
+<div class="row row-cols-1 row-cols-md-3 mb-0 text-center">
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th scope="col">№</th>
+            <th scope="col">username</th>
+            <th scope="col">email</th>
+            <th scope="col">phone_number</th>
+            <th scope="col"></th>
+            <th scope="col"></th>
+            <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+        <tr>
+            <th scope="row">{{ user.pk }}</th>
+            <td>{{ user.username }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.phone_number }}</td>
+            {% if perms.users.can_block_users %}
+            <td><form action="{% url 'users:block_user' user.pk %}" method="post">
+                            {% csrf_token %}
+                             {% if user.is_active %}
+                             <button class="btn btn-outline-danger">Заблокировать пользователя</button>
+                            {% else %}
+                             <button class="btn btn-outline-success">Разблокировать пользователя</button>
+                            {% endif %}
+                        </form></td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+{% endblock %}

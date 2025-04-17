@@ -1,0 +1,76 @@
+{% extends 'mailing/base.html' %}
+{% load static %}
+{% load my_tags %}
+
+{% block title %}Подробности рассылки{% endblock %}
+
+{% block content %}
+<div class="row row-cols-1 row-cols-md-3 mb-0 text-center" style="margin-top:100px; margin-left:150px;">
+    {% if request.user|has_group:"managers" or user == mailing.owner %}
+    <div class="col">
+        <div class="card shadow-sm mx-auto d-block" style="width:900px;">
+            <div class="card-body border-top">
+                <h5 class="card-title">{{ mailing.title }}</h5>
+                <p class="card-text border-top">{{ mailing.period_mail }}</p>
+                <p class="card-text border-top">{{ mailing.status_mail }}</p>
+                {% if request.user|has_group:"managers" %}
+                <p class="card-text border-top">Владелец: {{ mailing.owner }}</p>
+                {% endif %}
+                <p class="card-text border-top">Начало: {{ mailing.started_at }}</p>
+                <p class="card-text border-top">Окончание: {{ mailing.finished_at }}</p>
+                <p class="card-text border-top">Сообщение:
+                <a href="{% url 'mailing:message_details' mailing.message.pk %}" class="link-primary">{{ mailing.message }}</a></p>
+                <p class="card-text border-top">{{mailing.message.body }}</p>
+                <p class="card-text border-top">Клиенты: </p>
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th scope="col">№</th>
+                        <th scope="col">Ф.И.О.</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Комментарий</th>
+                        <th scope="col"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for client in mailing.clients.all %}
+                    <tr>
+                        <th scope="row">{{ client.pk }}</th>
+                        <td>{{ client.initials }}</td>
+                        <td>{{ client.email }}</td>
+                        <td>{{ client.comment }}</td>
+                        <td><a href="{% url 'mailing:client_details' client.pk %}" class="link-primary">Подробнее</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="btn-group">
+                        {% if user == mailing.owner %}
+                        <a href="{% url 'mailing:mailing_update' mailing.pk %}" type="button"
+                           class="btn btn-sm btn-outline-secondary">Редактировать</a>
+                        {% endif %}
+                        {% if perms.mailing.delete_mailing or user == mailing.owner %}
+                        <a href="{% url 'mailing:mailing_delete' mailing.pk %}" type="button"
+                           class="btn btn-sm btn-outline-danger">Удалить</a>
+                        {% endif %}
+                        <a href="{% url 'mailing:mailings_all' %}" type="button"
+                           class="btn btn-sm btn-outline-secondary">Назад</a>
+
+                        {% if user == mailing.owner %}
+                        <form action="{% url 'mailing:mailing_sendmail' mailing.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-success" style="margin-left:480px;">Отправить рассылку</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends 'mailing/base.html' %}
+{% load static %}
+{% load my_tags %}
+
+{% block title %}Главная страница{% endblock %}
+
+{% block header %}
+<div class="pricing-header p-3 pb-md-4 mx-auto text-center" style="margin-top:50px;">
+    {% if user.is_authenticated %}
+    <h1 class=" display-6 fw-normal">Добро пожаловать, {{user.username}}!</h1>
+    <p class="fs-5 text-muted">Здесь вы можете настроить свои рассылки.</p>
+    {% else %}
+    <h1 class=" display-7 fw-normal">Добро пожаловать в сервис управления рассылками!</h1>
+    {% endif %}
+</div>
+{% endblock %}
+
+
+{% block content %}
+{% if user.is_authenticated %}
+<div class="row row-cols-1 row-cols-md-3 mb-3 text-center" style="max-width: 1000px; margin: auto;">
+    <div class="col">
+        <div class="card mb-4 rounded-3 shadow-sm">
+            <img src="{% static 'images/message.jpg' %}" class="card-img-top" height="300" alt="message">
+            <div class="card-body border-top">
+                <p class="card-text" style="margin-bottom: 56px;">
+                    Количество сообщений: {{messages_count}}
+                </p>
+                <a href="{% url 'mailing:messages_all' %}" class="btn btn-outline-secondary">Сообщения</a>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card mb-4 rounded-3 shadow-sm">
+            <img src="{% static 'images/clients.png' %}" class="card-img-top" height="300" alt="clients">
+            <div class="card-body border-top">
+                <p class="card-text" style="margin-bottom: 56px;">
+                    Количество клиентов: {{clients_count}}
+                </p>
+                <a href="{% url 'mailing:clients_all' %}" class="btn btn-outline-secondary">Клиенты</a>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card mb-4 rounded-3 shadow-sm">
+            <img src="{% static 'images/mailing.jpg' %}" class="card-img-top" height="300" alt="mailing">
+            <div class="card-body border-top">
+                <p class="card-text">
+                    Количество рассылок: {{mailings_count}}
+                </p>
+                <p class="card-text">
+                    Количество запущенных рассылок: {{active_mailings_count}}
+                </p>
+                <a href="{% url 'mailing:mailings_all' %}" class="btn btn-outline-secondary">Рассылки</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% else %}
+<div class="pricing-header p-3 pb-md-4 mx-auto text-center" style="margin-top:50px;">
+    <p class="fs-5 text-muted">Пожалуйста, войдите или зарегистрируйтесь.</p>
+    <a class="link-primary" aria-current="page" href="{% url 'users:login' %}">Вход</a>
+    /
+    <a class="link-primary" aria-current="page" href="{% url 'users:register' %}">Регистрация</a>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends 'mailing/base.html' %}
+{% load static %}
+
+{% block title %}Login{% endblock %}
+
+{% block header %}
+<div class="pricing-header p-3 pb-md-4 mx-auto text-center" style="margin-top:50px;">
+    <h1 class=" display-6 fw-normal">Вход на сайт</h1>
+</div>
+{% endblock %}
+
+
+{% block content %}
+<div class="row text-start">
+    <div class="col-lg-10 col-md-6 col-sm-12 mx-auto">
+        <div class="card mb-4 box-shadow">
+            <div class="card-header">
+                <h4 class="my-0 font-weight-normal">Заполните поля</h4>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data" action="" class="form-floating">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-lg btn-block btn-outline-primary">Войти
+                    </button>
+                </form>
+                <p><a href="{% url 'users:password-reset' %}">Забыли пароль?</a></p>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
